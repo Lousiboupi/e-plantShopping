@@ -1,9 +1,16 @@
-import React, { useState,useEffect } from 'react';
-import './ProductList.css'
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem } from './actions';
+import './ProductList.css';
 import CartItem from './CartItem';
+
 function ProductList() {
     const [showCart, setShowCart] = useState(false); 
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const dispatch = useDispatch();
+    const cart = useSelector(state => state.cart);
+
+    const totalQuantity = cart.length;
 
     const plantsArray = [
         {
@@ -293,12 +300,37 @@ const handlePlantsClick = (e) => {
     </div>
     );
 }
-const [addedToCart, setAddedToCart] = useState({});
-const handleAddToCart = (product) => {
-    dispatch(addItem(product));
-    setAddedToCart((prevState) => ({
-       ...prevState,
-       [product.name]: true, // Set the product name as key and value as true to indicate it's added to cart
-     }));
-  };
+const handleAddToCart = (plant) => {
+    dispatch(addItem(plant));
+};
+
+return (
+    <div>
+        <h1>Product List</h1>
+        <p>Total Items in Cart: {totalQuantity}</p>
+        {plantsArray.map(category => (
+            <div key={category.category}>
+                <h2>{category.category}</h2>
+                <div className="plants">
+                    {category.plants.map(plant => (
+                        <div key={plant.name} className="plant">
+                            <img src={plant.image} alt={plant.name} />
+                            <h3>{plant.name}</h3>
+                            <p>{plant.description}</p>
+                            <p>{plant.cost}</p>
+                            <button onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        ))}
+        <div>
+            <h2>Cart</h2>
+            {cart.map((item, index) => (
+                <CartItem key={index} item={item} />
+            ))}
+        </div>
+    </div>
+);
+
 export default ProductList;
